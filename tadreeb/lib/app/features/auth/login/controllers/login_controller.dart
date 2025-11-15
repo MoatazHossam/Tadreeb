@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../../data/providers/api_provider.dart';
-import '../../../data/repositories/auth_repository.dart';
+import '../../../../data/providers/api_provider.dart';
+import '../../../../data/repositories/auth_repository.dart';
 
 class LoginController extends GetxController {
   LoginController(this._repository);
