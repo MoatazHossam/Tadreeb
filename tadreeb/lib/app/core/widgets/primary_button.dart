@@ -8,23 +8,37 @@ class PrimaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.isLoading = false,
+    this.enabled = true,
   });
 
   final String label;
   final VoidCallback onPressed;
   final bool isLoading;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
+    final isEnabled = enabled && !isLoading;
+
+    final gradient = isEnabled
+        ? AppColors.primaryGradient
+        : const LinearGradient(
+            colors: [Color(0xFFDADDE2), Color(0xFFDADDE2)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          );
+
+    final textColor = isEnabled ? Colors.white : AppColors.textSecondary;
+
     return ElevatedButton(
-      onPressed: isLoading ? null : onPressed,
+      onPressed: isEnabled ? onPressed : null,
       style: ElevatedButton.styleFrom(
         padding: EdgeInsets.zero,
       ),
       child: Ink(
-        decoration: const BoxDecoration(
-          gradient: AppColors.primaryGradient,
-          borderRadius: BorderRadius.all(Radius.circular(16)),
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
         ),
         child: Container(
           height: 56,
@@ -38,13 +52,13 @@ class PrimaryButton extends StatelessWidget {
                     strokeWidth: 3,
                   ),
                 )
-              : Text(
-                  label,
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
-                ),
+            : Text(
+                label,
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(color: textColor, fontWeight: FontWeight.w600),
+              ),
         ),
       ),
     );
