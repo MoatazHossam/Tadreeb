@@ -16,7 +16,7 @@ class LoginView extends GetView<LoginController> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             final minHeight = constraints.maxHeight.isFinite
-                ? (constraints.maxHeight - 48).clamp(0, double.infinity)
+                ? (constraints.maxHeight - 48).clamp(0, double.infinity).toDouble()
                 : 0.0;
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 24),
