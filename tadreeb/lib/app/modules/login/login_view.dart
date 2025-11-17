@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/widgets/auth_text_field.dart';
 import '../../core/widgets/primary_button.dart';
+import '../../config/routes/app_pages.dart';
 import 'login_controller.dart';
 
 class LoginView extends GetView<LoginController> {
@@ -132,7 +133,7 @@ class LoginView extends GetView<LoginController> {
                                     ?.copyWith(color: AppColors.textSecondary),
                               ),
                               TextButton(
-                                onPressed: () {},
+                                onPressed: () => Get.toNamed(Routes.register),
                                 style: TextButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 8),
                                   foregroundColor: AppColors.primary,
