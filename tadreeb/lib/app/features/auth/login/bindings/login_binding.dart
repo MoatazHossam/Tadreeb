@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
-import '../../../data/providers/api_provider.dart';
-import '../../../data/repositories/auth_repository.dart';
+import '../../../../data/providers/api_provider.dart';
+import '../../../../data/repositories/auth_repository.dart';
 import '../controllers/login_controller.dart';
 
 class LoginBinding extends Bindings {
