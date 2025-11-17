@@ -1,8 +1,8 @@
 import 'package:get/get.dart';
 
-import '../../features/auth/login/bindings/login_binding.dart';
-import '../../features/auth/login/controllers/login_controller.dart';
-import '../../features/auth/login/views/login_view.dart';
+import '../../modules/login/login_binding.dart';
+import '../../modules/login/login_controller.dart';
+import '../../modules/login/login_view.dart';
 
 part 'app_routes.dart';
 
