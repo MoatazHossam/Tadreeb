@@ -19,145 +19,135 @@ class LoginView extends GetView<LoginController> {
                 ? (constraints.maxHeight - 48).clamp(0, double.infinity).toDouble()
                 : 0.0;
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: minHeight),
-                child: IntrinsicHeight(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      const SizedBox(height: 40),
-                      _Header(),
-                      const SizedBox(height: 32),
-                      Card(
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 12),
+                    const _LogoHeader(),
+                    const SizedBox(height: 32),
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
                         color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(24),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 20,
+                            offset: const Offset(0, 12),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          AuthTextField(
+                            label: 'Email',
+                            hint: 'Enter your email',
+                            controller: controller.emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.next,
+                            prefix: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
+                          ),
+                          const SizedBox(height: 18),
+                          Obx(
+                            () => AuthTextField(
+                              label: 'Password',
+                              hint: 'Enter your password',
+                              controller: controller.passwordController,
+                              obscureText: !controller.isPasswordVisible.value,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) => controller.login(),
+                              prefix: const Icon(Icons.lock_outline, color: AppColors.textSecondary),
+                              suffix: IconButton(
+                                onPressed: controller.togglePassword,
+                                icon: Icon(
+                                  controller.isPasswordVisible.value
+                                      ? Icons.visibility_off
+                                      : Icons.visibility,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                foregroundColor: AppColors.primary,
+                                textStyle: const TextStyle(fontWeight: FontWeight.w600),
+                              ),
+                              child: const Text('Forgot Password?'),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Obx(
+                            () => AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: controller.errorMessage.value.isEmpty
+                                  ? const SizedBox.shrink()
+                                  : Container(
+                                      key: ValueKey(controller.errorMessage.value),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red.withOpacity(0.08),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        controller.errorMessage.value,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Obx(
+                            () => PrimaryButton(
+                              label: 'Login',
+                              isLoading: controller.isLoading.value,
+                              onPressed: controller.login,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                'Welcome Back',
-                                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Sign in to continue learning with Tadreeb',
+                                "Don't have an account?",
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyMedium
                                     ?.copyWith(color: AppColors.textSecondary),
                               ),
-                              const SizedBox(height: 32),
-                              AuthTextField(
-                                label: 'Email Address',
-                                hint: 'demo@tadreeb.ae',
-                                controller: controller.emailController,
-                                keyboardType: TextInputType.emailAddress,
-                                textInputAction: TextInputAction.next,
-                              ),
-                              const SizedBox(height: 20),
-                              Obx(
-                                () => AuthTextField(
-                                  label: 'Password',
-                                  hint: 'Enter your password',
-                                  controller: controller.passwordController,
-                                  obscureText: !controller.isPasswordVisible.value,
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) => controller.login(),
-                                  suffix: IconButton(
-                                    onPressed: controller.togglePassword,
-                                    icon: Icon(
-                                      controller.isPasswordVisible.value
-                                          ? Icons.visibility_off
-                                          : Icons.visibility,
-                                    ),
-                                  ),
+                              TextButton(
+                                onPressed: () {},
+                                style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  foregroundColor: AppColors.primary,
+                                  textStyle: const TextStyle(fontWeight: FontWeight.w700),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: TextButton(
-                                  onPressed: () {},
-                                  child: const Text('Forgot password?'),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                              Obx(
-                                () => AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 200),
-                                  child: controller.errorMessage.value.isEmpty
-                                      ? const SizedBox.shrink()
-                                      : Container(
-                                          key: ValueKey(controller.errorMessage.value),
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 16,
-                                            vertical: 12,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.red.withOpacity(0.08),
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          child: Text(
-                                            controller.errorMessage.value,
-                                            style: const TextStyle(
-                                              color: Colors.red,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Obx(
-                                () => PrimaryButton(
-                                  label: 'Login',
-                                  isLoading: controller.isLoading.value,
-                                  onPressed: controller.login,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'New to Tadreeb?',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(color: AppColors.textSecondary),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {},
-                                    child: const Text('Create account'),
-                                  ),
-                                ],
+                                child: const Text('Register'),
                               ),
                             ],
                           ),
-                        ),
+                        ],
                       ),
-                      const SizedBox(height: 32),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 24),
-                        child: Text(
-                          'By signing in, you agree to our Terms & Privacy Policy',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall
-                              ?.copyWith(color: AppColors.textSecondary),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 22),
+                    const _DemoAccountCard(),
+                  ],
                 ),
               ),
             );
@@ -168,45 +158,76 @@ class LoginView extends GetView<LoginController> {
   }
 }
 
-class _Header extends StatelessWidget {
+class _LogoHeader extends StatelessWidget {
+  const _LogoHeader();
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 18),
+          height: 96,
+          width: 96,
           decoration: const BoxDecoration(
             gradient: AppColors.primaryGradient,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-              bottomLeft: Radius.circular(24),
-              bottomRight: Radius.circular(24),
+            shape: BoxShape.circle,
+          ),
+          child: const Center(
+            child: Icon(
+              Icons.directions_car_filled,
+              color: Colors.white,
+              size: 44,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Tadreeb',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          'Tadreeb',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w800,
               ),
-              const SizedBox(height: 8),
-              Text(
-                'Learn. Practice. Succeed.',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(color: Colors.white70, fontWeight: FontWeight.w500),
-              ),
-            ],
-          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'Welcome back!',
+          style: Theme.of(context)
+              .textTheme
+              .titleMedium
+              ?.copyWith(color: AppColors.textSecondary),
         ),
       ],
+    );
+  }
+}
+
+class _DemoAccountCard extends StatelessWidget {
+  const _DemoAccountCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF3E5),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: const Color(0xFFFFD9B0)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Demo Account',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+          ),
+          const SizedBox(height: 10),
+          const Text('Email: demo@tadreeb.ae'),
+          const SizedBox(height: 6),
+          const Text('Password: demo123'),
+        ],
+      ),
     );
   }
 }

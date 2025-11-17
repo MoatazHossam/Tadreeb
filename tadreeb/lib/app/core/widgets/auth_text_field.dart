@@ -11,6 +11,7 @@ class AuthTextField extends StatelessWidget {
     this.keyboardType,
     this.onSubmitted,
     this.suffix,
+    this.prefix,
   });
 
   final String label;
@@ -21,6 +22,7 @@ class AuthTextField extends StatelessWidget {
   final TextInputType? keyboardType;
   final ValueChanged<String>? onSubmitted;
   final Widget? suffix;
+  final Widget? prefix;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +44,7 @@ class AuthTextField extends StatelessWidget {
           onSubmitted: onSubmitted,
           decoration: InputDecoration(
             hintText: hint,
+            prefixIcon: prefix,
             suffixIcon: suffix,
           ),
         ),
