@@ -30,6 +30,13 @@ class LoginController extends GetxController {
 
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
+    final osType = GetPlatform.isIOS
+        ? 'ios'
+        : GetPlatform.isAndroid
+            ? 'android'
+            : GetPlatform.isWeb
+                ? 'web'
+                : 'unknown';
 
     if (email.isEmpty || password.isEmpty) {
       errorMessage.value = 'Please enter both email and password';
@@ -39,7 +46,14 @@ class LoginController extends GetxController {
     try {
       isLoading.value = true;
       errorMessage.value = '';
-      final response = await _repository.login(email: email, password: password);
+      final response = await _repository.login(
+        email: email,
+        password: password,
+        deviceId: '',
+        osType: osType,
+        deviceName: '',
+        fcmToken: '',
+      );
       if (response.isAuthenticated) {
         await _tokenService.saveTokens(
           accessToken: response.accessToken,
