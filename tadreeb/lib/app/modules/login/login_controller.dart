@@ -3,11 +3,13 @@ import 'package:get/get.dart';
 
 import '../../data/providers/api_provider.dart';
 import '../../data/repositories/auth_repository.dart';
+import '../../data/services/token_service.dart';
 
 class LoginController extends GetxController {
-  LoginController(this._repository);
+  LoginController(this._repository, this._tokenService);
 
   final AuthRepository _repository;
+  final TokenService _tokenService;
 
   final emailController = TextEditingController(text: 'demo@tadreeb.ae');
   final passwordController = TextEditingController(text: 'demo123');
@@ -39,6 +41,10 @@ class LoginController extends GetxController {
       errorMessage.value = '';
       final response = await _repository.login(email: email, password: password);
       if (response.isAuthenticated) {
+        await _tokenService.saveTokens(
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken,
+        );
         final userName = response.user?.fullName?.trim();
         final greetingName =
             (userName?.isNotEmpty ?? false) ? userName! : response.user?.email ?? 'User';

@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import '../../core/constants/api_constants.dart';
+import '../../core/constants/constants.dart';
 
 class ApiProvider {
-  ApiProvider({http.Client? client, this.baseUrl = ApiConstants.baseUrl})
+  ApiProvider({http.Client? client, this.baseUrl = Constants.baseUrl})
       : _client = client ?? http.Client();
 
   final http.Client _client;
