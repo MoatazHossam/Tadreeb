@@ -1,4 +1,4 @@
-import '../../core/constants/api_constants.dart';
+import '../../core/constants/constants.dart';
 import '../providers/api_provider.dart';
 
 class AuthRepository {
@@ -8,10 +8,37 @@ class AuthRepository {
 
   Future<AuthResponse> login({required String email, required String password}) async {
     final result = await _apiProvider.post(
-      ApiConstants.login,
+      Constants.login,
       body: {
         'email': email,
         'password': password,
+      },
+    );
+
+    return AuthResponse.fromJson(result);
+  }
+
+  Future<AuthResponse> register({
+    required String email,
+    required String username,
+    required String firstName,
+    required String lastName,
+    required String phone,
+    required String password,
+    required String passwordConfirmation,
+    String userType = 'trainee',
+  }) async {
+    final result = await _apiProvider.post(
+      Constants.register,
+      body: {
+        'email': email,
+        'username': username,
+        'first_name': firstName,
+        'last_name': lastName,
+        'user_type': userType,
+        'phone': phone,
+        'password': password,
+        'password_confirm': passwordConfirmation,
       },
     );
 
@@ -24,11 +51,13 @@ class AuthResponse {
     required this.accessToken,
     required this.refreshToken,
     this.user,
+    this.message,
   });
 
   final String accessToken;
   final String refreshToken;
   final AuthUser? user;
+  final String? message;
 
   bool get isAuthenticated => accessToken.isNotEmpty;
 
@@ -39,6 +68,7 @@ class AuthResponse {
       user: json['user'] is Map<String, dynamic>
           ? AuthUser.fromJson(json['user'] as Map<String, dynamic>)
           : null,
+      message: json['message'] as String?,
     );
   }
 }
