@@ -69,6 +69,7 @@ class RegisterView extends GetView<RegisterController> {
                         label: 'Create Account',
                         onPressed: controller.register,
                         enabled: controller.canSubmit.value,
+                        isLoading: controller.isLoading.value,
                       ),
                     ),
                     const SizedBox(height: 18),
