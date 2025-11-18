@@ -1,3 +1,4 @@
+import '../../core/constants/api_constants.dart';
 import '../providers/api_provider.dart';
 
 class AuthRepository {
@@ -7,7 +8,7 @@ class AuthRepository {
 
   Future<AuthResponse> login({required String email, required String password}) async {
     final result = await _apiProvider.post(
-      '/login',
+      ApiConstants.login,
       body: {
         'email': email,
         'password': password,
@@ -19,11 +20,48 @@ class AuthRepository {
 }
 
 class AuthResponse {
-  AuthResponse({required this.token});
+  AuthResponse({
+    required this.accessToken,
+    required this.refreshToken,
+    this.user,
+  });
 
-  final String token;
+  final String accessToken;
+  final String refreshToken;
+  final AuthUser? user;
+
+  bool get isAuthenticated => accessToken.isNotEmpty;
 
   factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    return AuthResponse(token: json['token'] as String? ?? '');
+    return AuthResponse(
+      accessToken: (json['access'] ?? json['access_token'] ?? json['token']) as String? ?? '',
+      refreshToken: (json['refresh'] ?? json['refresh_token']) as String? ?? '',
+      user: json['user'] is Map<String, dynamic>
+          ? AuthUser.fromJson(json['user'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+}
+
+class AuthUser {
+  AuthUser({
+    required this.id,
+    required this.email,
+    this.fullName,
+    this.phoneNumber,
+  });
+
+  final int id;
+  final String email;
+  final String? fullName;
+  final String? phoneNumber;
+
+  factory AuthUser.fromJson(Map<String, dynamic> json) {
+    return AuthUser(
+      id: json['id'] as int? ?? 0,
+      email: json['email'] as String? ?? '',
+      fullName: (json['full_name'] ?? json['name']) as String?,
+      phoneNumber: (json['phone_number'] ?? json['phone']) as String?,
+    );
   }
 }
