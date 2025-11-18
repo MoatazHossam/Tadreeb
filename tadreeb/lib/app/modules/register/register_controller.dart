@@ -13,7 +13,7 @@ class RegisterController extends GetxController {
 
   final fullNameController = TextEditingController();
   final emailController = TextEditingController();
-  final phoneController = TextEditingController(text: '+971 50 123 4567');
+  final phoneController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
