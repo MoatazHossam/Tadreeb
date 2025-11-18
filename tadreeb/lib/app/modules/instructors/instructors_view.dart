@@ -302,6 +302,6 @@ class _InstructorCard extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ));
   }
 }
