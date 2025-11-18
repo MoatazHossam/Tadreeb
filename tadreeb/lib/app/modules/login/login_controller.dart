@@ -9,8 +9,8 @@ class LoginController extends GetxController {
 
   final AuthRepository _repository;
 
-  final emailController = TextEditingController(text: 'eve.holt@reqres.in');
-  final passwordController = TextEditingController(text: 'cityslicka');
+  final emailController = TextEditingController(text: 'demo@tadreeb.ae');
+  final passwordController = TextEditingController(text: 'demo123');
 
   final isPasswordVisible = false.obs;
   final isLoading = false.obs;
@@ -38,10 +38,13 @@ class LoginController extends GetxController {
       isLoading.value = true;
       errorMessage.value = '';
       final response = await _repository.login(email: email, password: password);
-      if (response.token.isNotEmpty) {
+      if (response.isAuthenticated) {
+        final userName = response.user?.fullName?.trim();
+        final greetingName =
+            (userName?.isNotEmpty ?? false) ? userName! : response.user?.email ?? 'User';
         Get.snackbar(
           'Welcome back!',
-          'You have successfully signed in.',
+          'Hello $greetingName, you have successfully signed in.',
           snackPosition: SnackPosition.BOTTOM,
           margin: const EdgeInsets.all(16),
         );
