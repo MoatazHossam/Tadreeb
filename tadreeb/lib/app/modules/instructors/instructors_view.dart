@@ -24,20 +24,49 @@ class InstructorsView extends GetView<InstructorsController> {
               const SizedBox(height: 16),
               Expanded(
                 child: Obx(
-                  () => ListView.separated(
-                    itemCount: controller.filteredInstructors.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 14),
-                    itemBuilder: (context, index) {
-                      final instructor = controller.filteredInstructors[index];
-                      return _InstructorCard(
-                        instructor: instructor,
-                        onTap: () => Get.toNamed(
-                          Routes.instructorDetails,
-                          arguments: instructor,
-                        ),
+                  () {
+                    if (controller.isLoading.value) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (controller.errorMessage.isNotEmpty) {
+                      return _StatusMessage(
+                        icon: Icons.error_outline,
+                        message: controller.errorMessage.value,
+                        actionLabel: 'Retry',
+                        onAction: controller.fetchInstructors,
                       );
-                    },
-                  ),
+                    }
+
+                    final instructors = controller.filteredInstructors;
+                    if (instructors.isEmpty) {
+                      return _StatusMessage(
+                        icon: Icons.search_off,
+                        message: 'No instructors found matching your search.',
+                        actionLabel: 'Reset search',
+                        onAction: () => controller.updateSearch(''),
+                      );
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: controller.fetchInstructors,
+                      child: ListView.separated(
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        itemCount: instructors.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 14),
+                        itemBuilder: (context, index) {
+                          final instructor = instructors[index];
+                          return _InstructorCard(
+                            instructor: instructor,
+                            onTap: () => Get.toNamed(
+                              Routes.instructorDetails,
+                              arguments: instructor,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
@@ -186,7 +215,7 @@ class _InstructorCard extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      instructor.name.substring(0, 1),
+                      instructor.name.isNotEmpty ? instructor.name[0] : '?',
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
@@ -253,7 +282,9 @@ class _InstructorCard extends StatelessWidget {
                               const Icon(Icons.star, color: Color(0xFFFFB300), size: 18),
                               const SizedBox(width: 4),
                               Text(
-                                instructor.rating.toStringAsFixed(1),
+                                instructor.rating > 0
+                                    ? instructor.rating.toStringAsFixed(1)
+                                    : '-',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.textPrimary,
@@ -303,5 +334,59 @@ class _InstructorCard extends StatelessWidget {
         ],
       ),
     ));
+  }
+}
+
+class _StatusMessage extends StatelessWidget {
+  const _StatusMessage({
+    required this.icon,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final IconData icon;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 42, color: AppColors.textSecondary),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 14),
+              ElevatedButton(
+                onPressed: onAction,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: Text(
+                  actionLabel!,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 }
