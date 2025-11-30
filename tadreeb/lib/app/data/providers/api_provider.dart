@@ -25,6 +25,30 @@ class ApiProvider {
       body: jsonEncode(body ?? <String, dynamic>{}),
     );
 
+    return _handleResponse(response);
+  }
+
+  Future<Map<String, dynamic>> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
+    final uri = Uri.parse('$baseUrl$path').replace(
+      queryParameters: queryParameters?.map(
+        (key, value) => MapEntry(key, value.toString()),
+      ),
+    );
+
+    final response = await _client.get(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+      },
+    );
+
+    return _handleResponse(response);
+  }
+
+  Map<String, dynamic> _handleResponse(http.Response response) {
     final decodedBody = response.body.isNotEmpty
         ? jsonDecode(response.body)
         : const <String, dynamic>{};
