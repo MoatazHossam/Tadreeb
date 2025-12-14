@@ -11,6 +11,7 @@ class InstructorDetailsController extends GetxController {
 
   final instructor = Rxn<Instructor>();
   final isLoading = false.obs;
+  final isPackagesLoading = false.obs;
   final errorMessage = ''.obs;
   int? _instructorId;
 
@@ -57,6 +58,7 @@ class InstructorDetailsController extends GetxController {
 
       final details = await _repository.fetchInstructorById(id);
       instructor.value = details;
+      await _fetchInstructorPackages(id);
     } on ApiException catch (error) {
       errorMessage.value = error.message;
     } catch (_) {
@@ -72,5 +74,20 @@ class InstructorDetailsController extends GetxController {
     }
 
     return Future.value();
+  }
+
+  Future<void> _fetchInstructorPackages(int id) async {
+    try {
+      isPackagesLoading.value = true;
+      final packages = await _repository.fetchInstructorPackages(id);
+      final currentInstructor = instructor.value;
+      if (currentInstructor != null) {
+        instructor.value = currentInstructor.copyWith(packages: packages);
+      }
+    } catch (_) {
+      // Packages are optional; errors should not block instructor details.
+    } finally {
+      isPackagesLoading.value = false;
+    }
   }
 }
