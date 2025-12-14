@@ -83,6 +83,13 @@ class Instructor {
         json['working_location_display'] as String? ?? json['working_location'] as String?;
     final startingPrice = _parseDouble(json['starting_price']);
     final currency = json['currency'] as String?;
+    final languages = _parseLanguages(json['languages']);
+    final availability = _parseAvailability(
+      json['availability'],
+      json['availability_weekdays'],
+    );
+    final packages = _parsePackages(json['packages']);
+    final about = json['bio'] as String? ?? json['about'] as String? ?? '';
 
     return Instructor(
       id: json['id'] as int?,
@@ -92,10 +99,10 @@ class Instructor {
       rating: rating,
       specializations: _parseSpecializations(json['specializations']),
       priceLabel: _formatPriceLabel(startingPrice, currency),
-      about: json['about'] as String? ?? '',
-      languages: const [],
-      availability: const [],
-      packages: const [],
+      about: about,
+      languages: languages,
+      availability: availability,
+      packages: packages,
       ratingCount: json['total_reviews'] as int?,
       avatarColor: null,
       isAcceptingStudents: json['is_accepting_students'] as bool?,
@@ -148,4 +155,117 @@ String _formatPriceLabel(double? startingPrice, String? currency) {
   }
 
   return 'From $formattedPrice';
+}
+
+List<String> _parseLanguages(dynamic languages) {
+  if (languages is List) {
+    return languages
+        .whereType<Map<String, dynamic>>()
+        .map((lang) {
+          final display = (lang['language_display'] as String?) ??
+              (lang['language'] as String?);
+          final proficiency =
+              (lang['proficiency_display'] as String?) ??
+                  (lang['proficiency'] as String?);
+
+          if (display == null || display.trim().isEmpty) return null;
+
+          final normalizedDisplay = display.trim();
+          if (proficiency == null || proficiency.trim().isEmpty) {
+            return normalizedDisplay;
+          }
+
+          return '$normalizedDisplay (${proficiency.trim()})';
+        })
+        .whereType<String>()
+        .toList();
+  }
+
+  if (languages is String) {
+    return languages
+        .split(',')
+        .map((lang) => lang.trim())
+        .where((lang) => lang.isNotEmpty)
+        .toList();
+  }
+
+  return const [];
+}
+
+List<String> _parseAvailability(dynamic availability, dynamic availabilityWeekdays) {
+  final source = availabilityWeekdays ?? availability;
+
+  List<String> parseFromString(String value) {
+    return value
+        .split(RegExp(r'[;,]'))
+        .expand((part) => part.split(RegExp(r'\s+')))
+        .map((day) => day.trim())
+        .where((day) => day.isNotEmpty)
+        .map(_capitalizeWord)
+        .toList();
+  }
+
+  if (source is List) {
+    return source
+        .whereType<String>()
+        .map(_capitalizeWord)
+        .where((day) => day.isNotEmpty)
+        .toList();
+  }
+
+  if (source is String) {
+    return parseFromString(source);
+  }
+
+  return const [];
+}
+
+List<InstructorPackage> _parsePackages(dynamic packages) {
+  if (packages is List) {
+    return packages
+        .whereType<Map<String, dynamic>>()
+        .map((package) {
+          final title = package['title'] as String? ??
+              package['name'] as String? ??
+              package['label'] as String?;
+          if (title == null || title.trim().isEmpty) return null;
+
+          final perks = package['perks'] is List
+              ? (package['perks'] as List)
+                  .whereType<String>()
+                  .map((perk) => perk.trim())
+                  .where((perk) => perk.isNotEmpty)
+                  .toList()
+              : const <String>[];
+
+          final originalPrice = _parseDouble(package['original_price']) ??
+              _parseDouble(package['price']) ??
+              _parseDouble(package['amount']);
+          final discountedPrice =
+              _parseDouble(package['discounted_price']) ?? originalPrice;
+
+          if (originalPrice == null || discountedPrice == null) return null;
+
+          return InstructorPackage(
+            title: title.trim(),
+            subtitle: package['subtitle'] as String? ??
+                package['description'] as String? ??
+                '',
+            perks: perks,
+            originalPrice: originalPrice,
+            discountedPrice: discountedPrice,
+            discountPercent: package['discount_percent'] as int?,
+          );
+        })
+        .whereType<InstructorPackage>()
+        .toList();
+  }
+
+  return const [];
+}
+
+String _capitalizeWord(String value) {
+  if (value.isEmpty) return value;
+  if (value.length == 1) return value.toUpperCase();
+  return value[0].toUpperCase() + value.substring(1).toLowerCase();
 }

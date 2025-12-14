@@ -89,4 +89,9 @@ class InstructorsRepository {
       (json) => Instructor.fromApiJson(json),
     );
   }
+
+  Future<Instructor> fetchInstructorById(int id) async {
+    final response = await _apiProvider.get('${Constants.trainers}$id/');
+    return Instructor.fromApiJson(response);
+  }
 }

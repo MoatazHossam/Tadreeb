@@ -10,111 +10,171 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
 
   @override
   Widget build(BuildContext context) {
-    final instructor = controller.instructor;
-
     return Scaffold(
       backgroundColor: AppColors.background,
-      bottomNavigationBar: _BottomBar(priceLabel: controller.bestPriceLabel),
+      bottomNavigationBar: Obx(
+        () {
+          final instructor = controller.instructor.value;
+          if (instructor == null) return const SizedBox.shrink();
+          return _BottomBar(priceLabel: controller.bestPriceLabel);
+        },
+      ),
       body: SafeArea(
-        child: Stack(
-          children: [
-            Container(
-              height: 220,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(0xFFE8EAEE), Color(0xFFD9DDE5)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+        child: Obx(
+          () {
+            if (controller.isLoading.value && controller.instructor.value == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (controller.errorMessage.isNotEmpty && controller.instructor.value == null) {
+              return _StatusMessage(
+                icon: Icons.error_outline,
+                message: controller.errorMessage.value,
+                actionLabel: 'Retry',
+                onAction: controller.retry,
+              );
+            }
+
+            final instructor = controller.instructor.value;
+            if (instructor == null) {
+              return const _StatusMessage(
+                icon: Icons.error_outline,
+                message: 'Unable to load instructor details.',
+              );
+            }
+
+            return Stack(
+              children: [
+                Container(
+                  height: 220,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFFE8EAEE), Color(0xFFD9DDE5)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      _HeaderIconButton(icon: Icons.arrow_back_ios_new, onPressed: Get.back),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  _OverviewCard(instructor: instructor),
-                  const SizedBox(height: 18),
-                  _SectionTitle('About'),
-                  _AboutCard(instructor: instructor),
-                  const SizedBox(height: 16),
-                  _SectionTitle('Specializations'),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: instructor.specializations
-                        .map((spec) => Chip(
-                              label: Text(
-                                spec,
-                                style: const TextStyle(
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: Color(0xFFE4E7ED)),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ))
-                        .toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionTitle('Availability'),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 10,
-                    runSpacing: 10,
-                    children: instructor.availability
-                        .map(
-                          (day) => Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: const Color(0xFFE4E7ED)),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.03),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              day,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  _SectionTitle('Choose Package'),
-                  const SizedBox(height: 12),
-                  ...instructor.packages
-                      .map(
-                        (package) => Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: _PackageCard(package: package),
+                RefreshIndicator(
+                  onRefresh: controller.retry,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            _HeaderIconButton(icon: Icons.arrow_back_ios_new, onPressed: Get.back),
+                          ],
                         ),
-                      )
-                      .toList(),
-                  const SizedBox(height: 90),
-                ],
-              ),
-            ),
-          ],
+                        const SizedBox(height: 16),
+                        _OverviewCard(instructor: instructor),
+                        const SizedBox(height: 18),
+                        _SectionTitle('About'),
+                        _AboutCard(instructor: instructor),
+                        const SizedBox(height: 16),
+                        _SectionTitle('Specializations'),
+                        const SizedBox(height: 8),
+                        if (instructor.specializations.isEmpty)
+                          const Text(
+                            'Specializations not provided',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        else
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: instructor.specializations
+                                .map((spec) => Chip(
+                                      label: Text(
+                                        spec,
+                                        style: const TextStyle(
+                                          color: AppColors.textPrimary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        side: const BorderSide(color: Color(0xFFE4E7ED)),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                        const SizedBox(height: 16),
+                        _SectionTitle('Availability'),
+                        const SizedBox(height: 10),
+                        if (instructor.availability.isEmpty)
+                          const Text(
+                            'Availability not specified',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        else
+                          Wrap(
+                            spacing: 10,
+                            runSpacing: 10,
+                            children: instructor.availability
+                                .map(
+                                  (day) => Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(color: const Color(0xFFE4E7ED)),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.03),
+                                          blurRadius: 8,
+                                          offset: const Offset(0, 6),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Text(
+                                      day,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.textPrimary,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                                .toList(),
+                          ),
+                        const SizedBox(height: 16),
+                        _SectionTitle('Choose Package'),
+                        const SizedBox(height: 12),
+                        if (instructor.packages.isEmpty)
+                          const Text(
+                            'Packages will be available soon.',
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          )
+                        else
+                          ...instructor.packages
+                              .map(
+                                (package) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: _PackageCard(package: package),
+                                ),
+                              )
+                              .toList(),
+                        const SizedBox(height: 90),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -151,17 +211,25 @@ class _OverviewCard extends StatelessWidget {
               gradient: instructor.avatarColor != null
                   ? LinearGradient(colors: [instructor.avatarColor!, AppColors.primary])
                   : const LinearGradient(colors: [Color(0xFF9E9E9E), Color(0xFFBDBDBD)]),
+              image: instructor.profilePicture != null
+                  ? DecorationImage(
+                      image: NetworkImage(instructor.profilePicture!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
             ),
-            child: Center(
-              child: Text(
-                instructor.name.substring(0, 1),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
+            child: instructor.profilePicture == null
+                ? Center(
+                    child: Text(
+                      instructor.name.substring(0, 1),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 32,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  )
+                : null,
           ),
           const SizedBox(height: 14),
           Text(
@@ -254,7 +322,9 @@ class _AboutCard extends StatelessWidget {
               ),
               _IconRow(
                 icon: Icons.language,
-                label: instructor.languages.join(', '),
+                label: instructor.languages.isEmpty
+                    ? 'Language preferences not specified'
+                    : instructor.languages.join(', '),
               ),
             ],
           ),
@@ -520,6 +590,48 @@ class _BottomBar extends StatelessWidget {
                 child: const Text('Book Now'),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusMessage extends StatelessWidget {
+  const _StatusMessage({
+    required this.icon,
+    required this.message,
+    this.actionLabel,
+    this.onAction,
+  });
+
+  final IconData icon;
+  final String message;
+  final String? actionLabel;
+  final VoidCallback? onAction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 48, color: AppColors.textSecondary),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w700,
+                  ),
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 12),
+              ElevatedButton(onPressed: onAction, child: Text(actionLabel!)),
+            ],
           ],
         ),
       ),
