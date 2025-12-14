@@ -43,6 +43,9 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
               );
             }
 
+            final bestPackage = _findBestPackage(instructor);
+            final packagesLoading = controller.isPackagesLoading.value;
+
             return RefreshIndicator(
               onRefresh: controller.retry,
               child: SingleChildScrollView(
@@ -52,7 +55,7 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
                   children: [
                     _ProfileHeader(
                       instructor: instructor,
-                      bestPackage: _findBestPackage(instructor),
+                      bestPackage: bestPackage,
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
@@ -139,7 +142,9 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
                           const SizedBox(height: 16),
                           _SectionTitle('Choose Package'),
                           const SizedBox(height: 12),
-                          if (instructor.packages.isEmpty)
+                          if (packagesLoading)
+                            const Center(child: CircularProgressIndicator())
+                          else if (instructor.packages.isEmpty)
                             const Text(
                               'Packages will be available soon.',
                               style: TextStyle(
