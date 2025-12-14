@@ -244,7 +244,45 @@ List<String> _parseLanguages(dynamic languages) {
 }
 
 List<String> _parseAvailability(dynamic availability, dynamic availabilityWeekdays) {
-  final source = availabilityWeekdays ?? availability;
+  const weekdayNames = [
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+  ];
+
+  int _resolveWeekdayIndex(dynamic weekday, String? label) {
+    if (weekday is int && weekday >= 0 && weekday < weekdayNames.length) {
+      return weekday;
+    }
+
+    if (label != null) {
+      final matchIndex = weekdayNames
+          .indexWhere((name) => name.toLowerCase() == label.toLowerCase());
+      if (matchIndex != -1) return matchIndex;
+    }
+
+    return weekdayNames.length + 1;
+  }
+
+  String? _resolveWeekdayLabel(dynamic weekday, dynamic display) {
+    if (display is String && display.trim().isNotEmpty) {
+      return _capitalizeWord(display.trim());
+    }
+
+    if (weekday is int && weekday >= 0 && weekday < weekdayNames.length) {
+      return weekdayNames[weekday];
+    }
+
+    if (weekday is String && weekday.trim().isNotEmpty) {
+      return _capitalizeWord(weekday.trim());
+    }
+
+    return null;
+  }
 
   List<String> parseFromString(String value) {
     return value
@@ -256,16 +294,43 @@ List<String> _parseAvailability(dynamic availability, dynamic availabilityWeekda
         .toList();
   }
 
-  if (source is List) {
-    return source
+  if (availabilityWeekdays is List) {
+    final parsedDays = availabilityWeekdays
+        .whereType<Map<String, dynamic>>()
+        .where((day) => day['is_available'] == true)
+        .map((day) {
+          final label = _resolveWeekdayLabel(day['weekday'], day['weekday_display']);
+          final index = _resolveWeekdayIndex(day['weekday'], label);
+          if (label == null) return null;
+          return MapEntry(index, label);
+        })
+        .whereType<MapEntry<int, String>>()
+        .toList();
+
+    parsedDays.sort((a, b) => a.key.compareTo(b.key));
+
+    final uniqueLabels = <String>[];
+    for (final entry in parsedDays) {
+      if (!uniqueLabels.contains(entry.value)) {
+        uniqueLabels.add(entry.value);
+      }
+    }
+
+    if (uniqueLabels.isNotEmpty) {
+      return uniqueLabels;
+    }
+  }
+
+  if (availability is List) {
+    return availability
         .whereType<String>()
         .map(_capitalizeWord)
         .where((day) => day.isNotEmpty)
         .toList();
   }
 
-  if (source is String) {
-    return parseFromString(source);
+  if (availability is String) {
+    return parseFromString(availability);
   }
 
   return const [];
