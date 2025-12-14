@@ -62,6 +62,7 @@ class LoginController extends GetxController {
           refreshToken: response.refreshToken,
         );
         Constants.accessToken = response.accessToken;
+        Constants.refreshToken = response.refreshToken;
 
         final userName = response.user?.fullName?.trim();
         final greetingName =

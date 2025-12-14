@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../core/constants/constants.dart';
 import '../../data/providers/api_provider.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/services/token_service.dart';
@@ -96,6 +97,8 @@ class RegisterController extends GetxController {
         accessToken: response.accessToken,
         refreshToken: response.refreshToken,
       );
+      Constants.accessToken = response.accessToken;
+      Constants.refreshToken = response.refreshToken;
 
       Get.snackbar(
         'Registration Successful',
