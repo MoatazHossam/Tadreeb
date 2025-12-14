@@ -63,6 +63,53 @@ class Instructor {
   final String? profilePicture;
   final int? userId;
 
+  Instructor copyWith({
+    int? id,
+    String? name,
+    int? experienceYears,
+    String? city,
+    double? rating,
+    List<String>? specializations,
+    String? priceLabel,
+    String? about,
+    List<String>? languages,
+    List<String>? availability,
+    List<InstructorPackage>? packages,
+    int? ratingCount,
+    Color? avatarColor,
+    bool? isAcceptingStudents,
+    double? startingPrice,
+    String? currency,
+    String? workingLocation,
+    String? workingLocationDisplay,
+    String? profilePicture,
+    int? userId,
+  }) {
+    return Instructor(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      experienceYears: experienceYears ?? this.experienceYears,
+      city: city ?? this.city,
+      rating: rating ?? this.rating,
+      specializations: specializations ?? this.specializations,
+      priceLabel: priceLabel ?? this.priceLabel,
+      about: about ?? this.about,
+      languages: languages ?? this.languages,
+      availability: availability ?? this.availability,
+      packages: packages ?? this.packages,
+      ratingCount: ratingCount ?? this.ratingCount,
+      avatarColor: avatarColor ?? this.avatarColor,
+      isAcceptingStudents: isAcceptingStudents ?? this.isAcceptingStudents,
+      startingPrice: startingPrice ?? this.startingPrice,
+      currency: currency ?? this.currency,
+      workingLocation: workingLocation ?? this.workingLocation,
+      workingLocationDisplay:
+          workingLocationDisplay ?? this.workingLocationDisplay,
+      profilePicture: profilePicture ?? this.profilePicture,
+      userId: userId ?? this.userId,
+    );
+  }
+
   factory Instructor.fromApiJson(Map<String, dynamic> json) {
     final user = json['user'] as Map<String, dynamic>?;
     final rawFullName = user?['full_name'] as String?;
@@ -114,6 +161,10 @@ class Instructor {
       userId: user?['id'] as int?,
     );
   }
+}
+
+List<InstructorPackage> parseInstructorPackages(dynamic packages) {
+  return _parsePackages(packages);
 }
 
 List<String> _parseSpecializations(dynamic specializations) {
@@ -230,21 +281,23 @@ List<InstructorPackage> _parsePackages(dynamic packages) {
               package['label'] as String?;
           if (title == null || title.trim().isEmpty) return null;
 
-          final perks = package['perks'] is List
-              ? (package['perks'] as List)
-                  .whereType<String>()
-                  .map((perk) => perk.trim())
-                  .where((perk) => perk.isNotEmpty)
-                  .toList()
-              : const <String>[];
+          final perks = _parsePerks(package['perks'], package['custom_perks']);
 
           final originalPrice = _parseDouble(package['original_price']) ??
               _parseDouble(package['price']) ??
-              _parseDouble(package['amount']);
+              _parseDouble(package['amount']) ??
+              _parseDouble(package['base_price']);
           final discountedPrice =
-              _parseDouble(package['discounted_price']) ?? originalPrice;
+              _parseDouble(package['discounted_price']) ??
+                  _parseDouble(package['final_price']) ??
+                  originalPrice;
 
           if (originalPrice == null || discountedPrice == null) return null;
+
+          final parsedDiscount =
+              _parseDouble(package['discount_percent']) ??
+                  _parseDouble(package['discount_percentage']);
+          final discountPercent = parsedDiscount?.round();
 
           return InstructorPackage(
             title: title.trim(),
@@ -254,7 +307,7 @@ List<InstructorPackage> _parsePackages(dynamic packages) {
             perks: perks,
             originalPrice: originalPrice,
             discountedPrice: discountedPrice,
-            discountPercent: package['discount_percent'] as int?,
+            discountPercent: discountPercent,
           );
         })
         .whereType<InstructorPackage>()
@@ -268,4 +321,36 @@ String _capitalizeWord(String value) {
   if (value.isEmpty) return value;
   if (value.length == 1) return value.toUpperCase();
   return value[0].toUpperCase() + value.substring(1).toLowerCase();
+}
+
+List<String> _parsePerks(dynamic perks, dynamic customPerks) {
+  final parsed = <String>[];
+
+  if (perks is List) {
+    for (final perk in perks) {
+      if (perk is String) {
+        final trimmed = perk.trim();
+        if (trimmed.isNotEmpty) parsed.add(trimmed);
+      } else if (perk is Map<String, dynamic>) {
+        final name = perk['name'] as String?;
+        final description = perk['description'] as String?;
+        if (name != null && name.trim().isNotEmpty) {
+          parsed.add(name.trim());
+        } else if (description != null && description.trim().isNotEmpty) {
+          parsed.add(description.trim());
+        }
+      }
+    }
+  }
+
+  if (customPerks is String && customPerks.trim().isNotEmpty) {
+    parsed.addAll(
+      customPerks
+          .split(RegExp(r'[\n,;]'))
+          .map((perk) => perk.trim())
+          .where((perk) => perk.isNotEmpty),
+    );
+  }
+
+  return parsed;
 }
