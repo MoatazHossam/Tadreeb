@@ -16,13 +16,12 @@ class ApiProvider {
     Map<String, dynamic>? body,
   }) async {
     final uri = Uri.parse('$baseUrl$path');
-    final response = await _client.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: jsonEncode(body ?? <String, dynamic>{}),
+    final response = await _sendWithAuth(
+      () => _client.post(
+        uri,
+        headers: _buildHeaders(includeContentType: true),
+        body: jsonEncode(body ?? <String, dynamic>{}),
+      ),
     );
 
     return _handleResponse(response);
@@ -38,14 +37,78 @@ class ApiProvider {
       ),
     );
 
-    final response = await _client.get(
-      uri,
-      headers: {
-        'Accept': 'application/json',
-      },
+    final response = await _sendWithAuth(
+      () => _client.get(
+        uri,
+        headers: _buildHeaders(),
+      ),
     );
 
     return _handleResponse(response);
+  }
+
+  Map<String, String> _buildHeaders({bool includeContentType = false}) {
+    final headers = <String, String>{
+      'Accept': 'application/json',
+      if (includeContentType) 'Content-Type': 'application/json',
+    };
+
+    final accessToken = Constants.accessToken;
+    if (accessToken != null && accessToken.isNotEmpty) {
+      headers['Authorization'] = 'Bearer $accessToken';
+    }
+
+    return headers;
+  }
+
+  Future<http.Response> _sendWithAuth(
+    Future<http.Response> Function() request,
+  ) async {
+    http.Response response = await request();
+
+    if (response.statusCode == 401 &&
+        Constants.refreshToken != null &&
+        Constants.refreshToken!.isNotEmpty) {
+      final refreshed = await _refreshAccessToken();
+      if (refreshed) {
+        response = await request();
+      }
+    }
+
+    return response;
+  }
+
+  Future<bool> _refreshAccessToken() async {
+    if (Constants.refreshToken == null || Constants.refreshToken!.isEmpty) {
+      return false;
+    }
+
+    final uri = Uri.parse('$baseUrl${Constants.refreshTokenEndpoint}');
+    try {
+      final response = await _client.post(
+        uri,
+        headers: _buildHeaders(includeContentType: true),
+        body: jsonEncode({'refresh': Constants.refreshToken}),
+      );
+
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        final decodedBody = response.body.isNotEmpty
+            ? jsonDecode(response.body)
+            : const <String, dynamic>{};
+
+        if (decodedBody is Map<String, dynamic>) {
+          final newAccessToken = (decodedBody['access'] ??
+                  decodedBody['access_token'] ??
+                  decodedBody['token']) as String?;
+          if (newAccessToken != null && newAccessToken.isNotEmpty) {
+            Constants.accessToken = newAccessToken;
+            return true;
+          }
+        }
+      }
+    } catch (_) {}
+
+    return false;
   }
 
   Map<String, dynamic> _handleResponse(http.Response response) {
