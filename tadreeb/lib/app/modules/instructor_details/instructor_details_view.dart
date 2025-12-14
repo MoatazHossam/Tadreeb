@@ -549,7 +549,7 @@ class _PackageCard extends StatelessWidget {
                   ),
                   ElevatedButton(
                     onPressed: () {},
-                    child: const Text('Book Now'),
+                    child: const Text('Book '),
                   ),
                 ],
               ),
@@ -638,7 +638,7 @@ class _BottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Container( height: 60, width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
       decoration: BoxDecoration(
         color: Colors.white,

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import '../../core/constants/constants.dart';
 import '../models/instructor.dart';
 import '../providers/api_provider.dart';
@@ -92,6 +95,8 @@ class InstructorsRepository {
 
   Future<Instructor> fetchInstructorById(int id) async {
     final response = await _apiProvider.get('${Constants.trainers}$id/');
+    log('Fetched instructor details: ${json.encode(response)}');
+
     return Instructor.fromApiJson(response);
   }
 }

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:get/get.dart';
 
 import '../../data/models/instructor.dart';
@@ -49,6 +52,7 @@ class InstructorDetailsController extends GetxController {
   }
 
   Future<void> fetchInstructorDetails(int id) async {
+    print('FETCHING INSTRUCTOR DETAILS FOR ID: $id');
     if (isLoading.value) return;
 
     try {
@@ -56,6 +60,7 @@ class InstructorDetailsController extends GetxController {
       errorMessage.value = '';
 
       final details = await _repository.fetchInstructorById(id);
+      print(details);
       instructor.value = details;
     } on ApiException catch (error) {
       errorMessage.value = error.message;
