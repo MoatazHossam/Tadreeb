@@ -6,6 +6,6 @@ class Constants {
   static const register = '/accounts/auth/register/';
   static const trainers = '/trainers/';
 
-  static const accessToken = 'accessToken';
-  static const refreshToken = 'refreshToken';
+  static String? accessToken ;
+  static String? refreshToken ;
 }

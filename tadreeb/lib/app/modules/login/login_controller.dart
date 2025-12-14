@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../config/routes/app_pages.dart';
+import '../../core/constants/constants.dart';
 import '../../data/providers/api_provider.dart';
 import '../../data/repositories/auth_repository.dart';
 import '../../data/services/token_service.dart';
@@ -59,6 +61,8 @@ class LoginController extends GetxController {
           accessToken: response.accessToken,
           refreshToken: response.refreshToken,
         );
+        Constants.accessToken = response.accessToken;
+
         final userName = response.user?.fullName?.trim();
         final greetingName =
             (userName?.isNotEmpty ?? false) ? userName! : response.user?.email ?? 'User';
@@ -68,6 +72,7 @@ class LoginController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
           margin: const EdgeInsets.all(16),
         );
+        Get.offAndToNamed(Routes.instructors);
       } else {
         errorMessage.value = 'Invalid credentials, please try again.';
       }
