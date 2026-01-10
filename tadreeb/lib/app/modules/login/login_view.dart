@@ -147,7 +147,7 @@ class LoginView extends GetView<LoginController> {
                       ),
                     ),
                     const SizedBox(height: 22),
-                    const _DemoAccountCard(),
+                    // const _DemoAccountCard(),
                   ],
                 ),
               ),
@@ -172,7 +172,7 @@ class _LogoHeader extends StatelessWidget {
           decoration: const BoxDecoration(
             gradient: AppColors.primaryGradient,
             shape: BoxShape.circle,
-          ),
+          ), 
           child: const Center(
             child: Icon(
               Icons.directions_car_filled,

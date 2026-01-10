@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:http/http.dart' as http;
 
@@ -24,6 +25,8 @@ class ApiProvider {
       ),
     );
 
+    log(response.body);
+
     return _handleResponse(response);
   }
 
@@ -43,6 +46,7 @@ class ApiProvider {
         headers: _buildHeaders(),
       ),
     );
+    log(response.body);
 
     return _handleResponse(response);
   }

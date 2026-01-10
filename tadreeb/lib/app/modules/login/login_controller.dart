@@ -13,8 +13,8 @@ class LoginController extends GetxController {
   final AuthRepository _repository;
   final TokenService _tokenService;
 
-  final emailController = TextEditingController(text: 'demo@tadreeb.ae');
-  final passwordController = TextEditingController(text: 'demo123');
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
 
   final isPasswordVisible = false.obs;
   final isLoading = false.obs;

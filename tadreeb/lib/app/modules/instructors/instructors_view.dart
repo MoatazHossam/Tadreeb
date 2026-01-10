@@ -237,7 +237,7 @@ class _InstructorCard extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  instructor.name,
+                                  instructor.englishName ?? ' - ',
                                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                                       fontWeight: FontWeight.w800,
                                     ),

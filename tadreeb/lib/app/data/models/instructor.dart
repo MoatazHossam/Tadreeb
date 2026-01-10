@@ -40,10 +40,15 @@ class Instructor {
     this.workingLocationDisplay,
     this.profilePicture,
     this.userId,
+    this.englishName,
+    this.arabicName,
   });
 
   final int? id;
   final String name;
+  final String? englishName;
+  final String? arabicName;
+
   final int experienceYears;
   final String city;
   final double rating;
@@ -84,6 +89,8 @@ class Instructor {
     String? workingLocationDisplay,
     String? profilePicture,
     int? userId,
+    String? englishName,
+    String? arabicName,
   }) {
     return Instructor(
       id: id ?? this.id,
@@ -107,6 +114,8 @@ class Instructor {
           workingLocationDisplay ?? this.workingLocationDisplay,
       profilePicture: profilePicture ?? this.profilePicture,
       userId: userId ?? this.userId,
+      englishName: this.englishName,
+      arabicName: this.arabicName,
     );
   }
 
@@ -137,6 +146,8 @@ class Instructor {
     );
     final packages = _parsePackages(json['packages']);
     final about = json['bio'] as String? ?? json['about'] as String? ?? '';
+    final englishName = user?['english_name'] as String?;
+    final arabicName = user?['arabic_name'] as String? ?? '';
 
     return Instructor(
       id: json['id'] as int?,
@@ -159,6 +170,8 @@ class Instructor {
       workingLocationDisplay: workingLocationDisplay,
       profilePicture: user?['profile_picture'] as String?,
       userId: user?['id'] as int?,
+      englishName: englishName,
+      arabicName: arabicName
     );
   }
 }
