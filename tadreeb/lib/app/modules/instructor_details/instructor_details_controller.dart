@@ -85,12 +85,18 @@ class InstructorDetailsController extends GetxController {
     return Future.value();
   }
 
-  Future<void> bookNow() async {
+  Future<void> bookNow(int packageId) async {
     if (isBooking.value) return;
+
+    print(formattedDate(DateTime.now().add(Duration(days: 1)).toString()));
 
     try {
       isBooking.value = true;
-      final response = await _bookingsRepository.createBooking();
+      final response = await _bookingsRepository.createBooking(body: {
+        'trainee_notes': '',
+        'package_id': packageId,
+        'start_date': formattedDate(DateTime.now().add(Duration(days: 1)).toString()),
+      });
       final bookingReference = response['booking_reference']?.toString();
       final statusDisplay = response['status_display']?.toString();
       var message = 'Your booking request has been created.';
@@ -124,6 +130,15 @@ class InstructorDetailsController extends GetxController {
     } finally {
       isBooking.value = false;
     }
+  }
+
+  //format date
+  String formattedDate(String dateStr) {
+    final dateTime = DateTime.parse(dateStr);
+    final formatted = '${dateTime.year.toString().padLeft(4, '0')}-'
+        '${dateTime.month.toString().padLeft(2, '0')}-'
+        '${dateTime.day.toString().padLeft(2, '0')}';
+    return formatted;
   }
 
   Future<void> _fetchInstructorPackages(int id) async {

@@ -12,17 +12,17 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      bottomNavigationBar: Obx(
-        () {
-          final instructor = controller.instructor.value;
-          if (instructor == null) return const SizedBox.shrink();
-          return _BottomBar(
-            priceLabel: controller.bestPriceLabel,
-            isBooking: controller.isBooking.value,
-            onPressed: controller.bookNow,
-          );
-        },
-      ),
+      // bottomNavigationBar: Obx(
+      //   () {
+      //     final instructor = controller.instructor.value;
+      //     if (instructor == null) return const SizedBox.shrink();
+      //     return _BottomBar(
+      //       priceLabel: controller.bestPriceLabel,
+      //       isBooking: controller.isBooking.value,
+      //       onPressed: controller.bookNow,
+      //     );
+      //   },
+      // ),
       body: SafeArea(
         child: Obx(
           () {
@@ -164,7 +164,7 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
                                     child: _PackageCard(
                                       package: package,
                                       isBooking: controller.isBooking.value,
-                                      onPressed: controller.bookNow,
+                                      onPressed: (){controller.bookNow(package.id);},
                                     ),
                                   ),
                                 )

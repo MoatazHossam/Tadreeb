@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class InstructorPackage {
   const InstructorPackage({
+    required this.id,
     required this.title,
     required this.subtitle,
     required this.perks,
@@ -10,6 +11,7 @@ class InstructorPackage {
     this.discountPercent,
   });
 
+  final int id;
   final String title;
   final String subtitle;
   final List<String> perks;
@@ -378,6 +380,7 @@ List<InstructorPackage> _parsePackages(dynamic packages) {
           final discountPercent = parsedDiscount?.round();
 
           return InstructorPackage(
+            id: package['id'],
             title: title.trim(),
             subtitle: package['subtitle'] as String? ??
                 package['description'] as String? ??
