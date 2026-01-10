@@ -161,7 +161,11 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
                                 .map(
                                   (package) => Padding(
                                     padding: const EdgeInsets.only(bottom: 12),
-                                    child: _PackageCard(package: package),
+                                    child: _PackageCard(
+                                      package: package,
+                                      isBooking: controller.isBooking.value,
+                                      onPressed: controller.bookNow,
+                                    ),
                                   ),
                                 )
                                 .toList(),
@@ -435,9 +439,15 @@ class _AboutCard extends StatelessWidget {
 }
 
 class _PackageCard extends StatelessWidget {
-  const _PackageCard({required this.package});
+  const _PackageCard({
+    required this.package,
+    required this.isBooking,
+    required this.onPressed,
+  });
 
   final InstructorPackage package;
+  final bool isBooking;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -557,8 +567,17 @@ class _PackageCard extends StatelessWidget {
                     ],
                   ),
                   ElevatedButton(
-                    onPressed: () {},
-                    child: const Text('Book '),
+                    onPressed: isBooking ? null : onPressed,
+                    child: isBooking
+                        ? const SizedBox(
+                            height: 18,
+                            width: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text('Book '),
                   ),
                 ],
               ),
