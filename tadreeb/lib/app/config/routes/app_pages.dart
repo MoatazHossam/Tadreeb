@@ -9,6 +9,15 @@ import '../../modules/instructor_details/instructor_details_view.dart';
 import '../../modules/login/login_binding.dart';
 import '../../modules/login/login_controller.dart';
 import '../../modules/login/login_view.dart';
+import '../../modules/offers/offers_binding.dart';
+import '../../modules/offers/offers_controller.dart';
+import '../../modules/offers/offers_view.dart';
+import '../../modules/bookings/bookings_binding.dart';
+import '../../modules/bookings/bookings_controller.dart';
+import '../../modules/bookings/bookings_view.dart';
+import '../../modules/profile/profile_binding.dart';
+import '../../modules/profile/profile_controller.dart';
+import '../../modules/profile/profile_view.dart';
 import '../../modules/register/register_binding.dart';
 import '../../modules/register/register_controller.dart';
 import '../../modules/register/register_view.dart';
@@ -30,6 +39,21 @@ class AppPages {
       name: Routes.instructors,
       page: () => const InstructorsView(),
       binding: InstructorsBinding(),
+    ),
+    GetPage<OffersController>(
+      name: Routes.offers,
+      page: () => const OffersView(),
+      binding: OffersBinding(),
+    ),
+    GetPage<BookingsController>(
+      name: Routes.bookings,
+      page: () => const BookingsView(),
+      binding: BookingsBinding(),
+    ),
+    GetPage<ProfileController>(
+      name: Routes.profile,
+      page: () => const ProfileView(),
+      binding: ProfileBinding(),
     ),
     GetPage<InstructorDetailsController>(
       name: Routes.instructorDetails,
