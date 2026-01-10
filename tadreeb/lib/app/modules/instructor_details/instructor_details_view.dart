@@ -16,7 +16,11 @@ class InstructorDetailsView extends GetView<InstructorDetailsController> {
         () {
           final instructor = controller.instructor.value;
           if (instructor == null) return const SizedBox.shrink();
-          return _BottomBar(priceLabel: controller.bestPriceLabel);
+          return _BottomBar(
+            priceLabel: controller.bestPriceLabel,
+            isBooking: controller.isBooking.value,
+            onPressed: controller.bookNow,
+          );
         },
       ),
       body: SafeArea(
@@ -637,9 +641,15 @@ class _HeaderIconButton extends StatelessWidget {
 }
 
 class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.priceLabel});
+  const _BottomBar({
+    required this.priceLabel,
+    required this.isBooking,
+    required this.onPressed,
+  });
 
   final String priceLabel;
+  final bool isBooking;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -682,8 +692,17 @@ class _BottomBar extends StatelessWidget {
             SizedBox(
               width: 140,
               child: ElevatedButton(
-                onPressed: () {},
-                child: const Text('Book Now'),
+                onPressed: isBooking ? null : onPressed,
+                child: isBooking
+                    ? const SizedBox(
+                        height: 18,
+                        width: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text('Book Now'),
               ),
             ),
           ],

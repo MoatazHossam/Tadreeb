@@ -5,16 +5,19 @@ import 'package:get/get.dart';
 
 import '../../data/models/instructor.dart';
 import '../../data/providers/api_provider.dart';
+import '../../data/repositories/bookings_repository.dart';
 import '../../data/repositories/instructors_repository.dart';
 
 class InstructorDetailsController extends GetxController {
-  InstructorDetailsController(this._repository);
+  InstructorDetailsController(this._repository, this._bookingsRepository);
 
   final InstructorsRepository _repository;
+  final BookingsRepository _bookingsRepository;
 
   final instructor = Rxn<Instructor>();
   final isLoading = false.obs;
   final isPackagesLoading = false.obs;
+  final isBooking = false.obs;
   final errorMessage = ''.obs;
   int? _instructorId;
 
@@ -79,6 +82,47 @@ class InstructorDetailsController extends GetxController {
     }
 
     return Future.value();
+  }
+
+  Future<void> bookNow() async {
+    if (isBooking.value) return;
+
+    try {
+      isBooking.value = true;
+      final response = await _bookingsRepository.createBooking();
+      final bookingReference = response['booking_reference']?.toString();
+      final statusDisplay = response['status_display']?.toString();
+      var message = 'Your booking request has been created.';
+      if (bookingReference != null && bookingReference.isNotEmpty) {
+        message = 'Booking $bookingReference created.';
+      }
+      if (statusDisplay != null && statusDisplay.isNotEmpty) {
+        message = '$message Status: $statusDisplay.';
+      }
+
+      Get.snackbar(
+        'Booking requested',
+        message,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+    } on ApiException catch (error) {
+      Get.snackbar(
+        'Booking failed',
+        error.message,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+    } catch (_) {
+      Get.snackbar(
+        'Booking failed',
+        'Something went wrong while creating your booking.',
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+    } finally {
+      isBooking.value = false;
+    }
   }
 
   Future<void> _fetchInstructorPackages(int id) async {
