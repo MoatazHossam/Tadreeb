@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../config/routes/app_pages.dart';
+import '../../core/widgets/app_bottom_nav_bar.dart';
 import '../../data/models/instructor.dart';
 import '../../core/theme/app_theme.dart';
 import 'instructors_controller.dart';
@@ -73,6 +74,7 @@ class InstructorsView extends GetView<InstructorsController> {
           ),
         ),
       ),
+      bottomNavigationBar: const AppBottomNavBar(currentIndex: 0),
     );
   }
 }
