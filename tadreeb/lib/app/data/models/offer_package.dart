@@ -32,7 +32,7 @@ class OfferPackage {
   final double? pricePerHour;
   final bool isFeatured;
   final List<String> perks;
-  final String? customPerks;
+  final List<String>? customPerks;
   final String? currency;
   final double? trainerRating;
   final String? trainerLocation;
@@ -45,8 +45,14 @@ class OfferPackage {
 }
 
 OfferPackage offerPackageFromJson(Map<String, dynamic> json) {
-  final trainerName = json['trainer'] as String? ?? 'Unknown Trainer';
+  final trainer = json['trainer'];
+  final trainerDetails = _parseTrainerDetails(trainer);
+  final trainerName = trainerDetails.name;
+  final trainerRating = trainerDetails.rating ?? _parseDouble(json['trainer_rating']);
+  final trainerLocation =
+      trainerDetails.location ?? json['trainer_location'] as String?;
   final perks = _parsePerks(json['perks'], json['custom_perks']);
+  final customPerks = _parseCustomPerks(json['custom_perks']);
   final basePrice = _parseDouble(json['base_price']);
   final finalPrice = _parseDouble(json['final_price']);
   final pricePerHour = _parseDouble(json['price_per_hour']);
@@ -68,11 +74,35 @@ OfferPackage offerPackageFromJson(Map<String, dynamic> json) {
     pricePerHour: pricePerHour,
     isFeatured: json['is_featured'] as bool? ?? false,
     perks: perks,
-    customPerks: json['custom_perks'] as String?,
+    customPerks: customPerks.isEmpty ? null : customPerks,
     currency: json['currency'] as String?,
-    trainerRating: _parseDouble(json['trainer_rating']),
-    trainerLocation: json['trainer_location'] as String?,
+    trainerRating: trainerRating,
+    trainerLocation: trainerLocation,
   );
+}
+
+class _TrainerDetails {
+  const _TrainerDetails({required this.name, this.rating, this.location});
+
+  final String name;
+  final double? rating;
+  final String? location;
+}
+
+_TrainerDetails _parseTrainerDetails(dynamic trainer) {
+  if (trainer is Map<String, dynamic>) {
+    final name = trainer['full_name'] as String? ??
+        trainer['name'] as String? ??
+        'Unknown Trainer';
+    final rating = _parseDouble(trainer['average_rating']);
+    final location = trainer['working_location_display'] as String? ??
+        trainer['working_location'] as String?;
+    return _TrainerDetails(name: name, rating: rating, location: location);
+  }
+  if (trainer is String && trainer.trim().isNotEmpty) {
+    return _TrainerDetails(name: trainer.trim());
+  }
+  return const _TrainerDetails(name: 'Unknown Trainer');
 }
 
 int? _parseInt(dynamic value) {
@@ -110,14 +140,26 @@ List<String> _parsePerks(dynamic perks, dynamic customPerks) {
     }
   }
 
-  if (customPerks is String && customPerks.trim().isNotEmpty) {
-    parsed.addAll(
-      customPerks
-          .split(RegExp(r'[\n,;]'))
-          .map((perk) => perk.trim())
-          .where((perk) => perk.isNotEmpty),
-    );
-  }
+  parsed.addAll(_parseCustomPerks(customPerks));
 
   return parsed;
+}
+
+List<String> _parseCustomPerks(dynamic customPerks) {
+  if (customPerks == null) return [];
+  if (customPerks is List) {
+    return customPerks
+        .whereType<String>()
+        .map((perk) => perk.trim())
+        .where((perk) => perk.isNotEmpty)
+        .toList();
+  }
+  if (customPerks is String && customPerks.trim().isNotEmpty) {
+    return customPerks
+        .split(RegExp(r'[\n,;]'))
+        .map((perk) => perk.trim())
+        .where((perk) => perk.isNotEmpty)
+        .toList();
+  }
+  return [];
 }
