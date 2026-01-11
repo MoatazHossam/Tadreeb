@@ -5,6 +5,7 @@ class Constants {
   static const login = '/accounts/auth/login/';
   static const register = '/accounts/auth/register/';
   static const refreshTokenEndpoint = '/accounts/auth/token/refresh/';
+  static const profile = '/accounts/profile/';
   static const trainers = '/trainers/';
   static const bookings = '/bookings/';
   static const bookingsList = '/bookings/list/';
