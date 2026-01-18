@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 
 import '../../data/models/booking.dart';
@@ -63,7 +64,7 @@ class TrainerBookingsController extends GetxController {
         margin: const EdgeInsets.all(16),
       );
     } catch (_) {
-      Get.snackbar(
+      Get.snackbar( 
         'Approval failed',
         'Something went wrong while approving the booking.',
         snackPosition: SnackPosition.BOTTOM,
