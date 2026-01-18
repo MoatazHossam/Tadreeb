@@ -47,6 +47,11 @@ class Booking {
         normalized == 'done' ||
         normalized == 'finished';
   }
+
+  bool get isPending {
+    final normalized = status.toLowerCase();
+    return normalized == 'pending';
+  }
 }
 
 DateTime? _parseDate(dynamic value) {

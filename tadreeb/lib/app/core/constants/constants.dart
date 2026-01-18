@@ -11,6 +11,8 @@ class Constants {
   static const bookingsList = '/bookings/list/';
   static const packages = '/packages/';
 
+  static String bookingApprove(int bookingId) => '/bookings/$bookingId/approve/';
+
   static String? accessToken;
   static String? refreshToken;
 }
