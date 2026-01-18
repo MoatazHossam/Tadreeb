@@ -30,4 +30,12 @@ class BookingsRepository {
 
     return PaginatedResponse.fromJson(response, Booking.fromJson);
   }
+
+  Future<Booking> approveBooking(int bookingId) async {
+    final response = await _apiProvider.post(
+      Constants.bookingApprove(bookingId),
+    );
+
+    return Booking.fromJson(response);
+  }
 }

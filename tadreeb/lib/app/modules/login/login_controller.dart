@@ -73,7 +73,11 @@ class LoginController extends GetxController {
           snackPosition: SnackPosition.BOTTOM,
           margin: const EdgeInsets.all(16),
         );
-        Get.offAndToNamed(Routes.instructors);
+        final userType = response.user?.userType?.toLowerCase().trim();
+        final destination = userType == 'trainer'
+            ? Routes.trainerBookings
+            : Routes.instructors;
+        Get.offAndToNamed(destination);
       } else {
         errorMessage.value = 'Invalid credentials, please try again.';
       }

@@ -9,4 +9,5 @@ abstract class Routes {
   static const bookings = '/bookings';
   static const profile = '/profile';
   static const instructorDetails = '/instructor-details';
+  static const trainerBookings = '/trainer-bookings';
 }

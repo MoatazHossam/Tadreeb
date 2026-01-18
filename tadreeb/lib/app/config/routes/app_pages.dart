@@ -21,6 +21,9 @@ import '../../modules/profile/profile_view.dart';
 import '../../modules/register/register_binding.dart';
 import '../../modules/register/register_controller.dart';
 import '../../modules/register/register_view.dart';
+import '../../modules/trainer_bookings/trainer_bookings_binding.dart';
+import '../../modules/trainer_bookings/trainer_bookings_controller.dart';
+import '../../modules/trainer_bookings/trainer_bookings_view.dart';
 
 part 'app_routes.dart';
 
@@ -64,6 +67,11 @@ class AppPages {
       name: Routes.register,
       page: () => const RegisterView(),
       binding: RegisterBinding(),
+    ),
+    GetPage<TrainerBookingsController>(
+      name: Routes.trainerBookings,
+      page: () => const TrainerBookingsView(),
+      binding: TrainerBookingsBinding(),
     ),
   ];
 }
