@@ -64,7 +64,10 @@ class ProfileView extends GetView<ProfileController> {
                       _InlineError(message: controller.errorMessage.value),
                       const SizedBox(height: 12),
                     ],
-                    _ProfileCard(profile: profile),
+                    Align(
+                      alignment: Alignment.center,
+                      child: _ProfileCard(profile: profile)
+                    ),
                     const SizedBox(height: 20),
                     _StatsCard(
                       totalBookings: controller.totalBookings.value,
@@ -162,7 +165,7 @@ class _ProfileCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Container(width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
